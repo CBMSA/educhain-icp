@@ -1,38 +1,31 @@
 
-import { Actor, HttpAgent } from "@dfinity/agent";
-import { idlFactory as eduFactory } from "../../.dfx/local/canisters/educhain_backend";
+import { educhain_backend } from "../../declarations/educhain_backend";
 
-const agent = new HttpAgent();
-const EduChain = Actor.createActor(eduFactory, {
-    agent,
-    canisterId: "rrkah-fqaaa-aaaaa-aaaaq-cai" // Replace with your real canister ID
-});
+const output = document.getElementById("output")!;
 
-async function issueCredential() {
-    const student = (document.getElementById("student") as HTMLInputElement).value;
-    const title = (document.getElementById("title") as HTMLInputElement).value;
-    const desc = (document.getElementById("description") as HTMLInputElement).value;
-    const result = await EduChain.issueCredential(student, title, desc);
-    alert(JSON.stringify(result));
-}
+(window as any).addCredential = async () => {
+  const studentId = (document.getElementById("studentId") as HTMLInputElement).value;
+  const credential = (document.getElementById("credential") as HTMLInputElement).value;
 
-async function getCredentials() {
-    const student = (document.getElementById("student") as HTMLInputElement).value;
-    const creds = await EduChain.getCredentials(student);
-    document.getElementById("output").innerText = JSON.stringify(creds, null, 2);
-}
+  if (!studentId || !credential) {
+    output.innerText = "Please enter both fields.";
+    return;
+  }
 
-document.body.innerHTML += `
-    <h2>EduChain - Issue and Verify Micro-Credentials</h2>
-    <input id="student" placeholder="Student Principal ID" /><br/>
-    <input id="title" placeholder="Credential Title" /><br/>
-    <input id="description" placeholder="Description" /><br/>
-    <button onclick="issueCredential()">Issue Credential</button>
-    <button onclick="getCredentials()">Get Credentials</button>
-    <pre id="output"></pre>
-`;
+  await educhain_backend.addCredential(studentId, credential);
+  output.innerText = `✅ Credential added for student ID: ${studentId}`;
+};
 
-(window as any).issueCredential = issueCredential;
-(window as any).getCredentials = getCredentials;
+(window as any).getCredential = async () => {
+  const studentId = (document.getElementById("studentId") as HTMLInputElement).value;
 
+  if (!studentId) {
+    output.innerText = "Please enter a Student ID.";
+    return;
+  }
 
+  const credential = await educhain_backend.getCredential(studentId);
+  output.innerText = credential
+    ? `🎓 Credential for ${studentId}: ${credential}`
+    : `⚠️ No credential found for ID: ${studentId}`;
+};
