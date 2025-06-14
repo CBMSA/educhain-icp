@@ -26,5 +26,6 @@ live-server frontend
 Live Demo
 
 Visit: https://cbmsa.github.io/educhain-icp/
-
+Repository Link :
+https://github.com/CBMSA/educhain-icp
 Submitted by: Blessing Farai Muneri 
